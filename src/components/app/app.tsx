@@ -13,15 +13,17 @@ import { Modal, OrderInfo, IngredientDetails } from '@components';
 import '../../index.css';
 import styles from './app.module.css';
 import { AppHeader } from '@components';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { fetchIngredients } from '../../slices/ingredientsSlice';
-import { AppDispatch } from 'src/store';
+import { AppDispatch } from '../../store';
 
 const AppContent = () => {
   const location = useLocation();
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+  const handleCloseModal = () => navigate(-1);
 
   useEffect(() => {
     dispatch(fetchIngredients());
@@ -54,10 +56,7 @@ const AppContent = () => {
           <Route
             path='/feed/:number'
             element={
-              <Modal
-                title='Детали заказа'
-                onClose={() => window.history.back()}
-              >
+              <Modal title='Детали заказа' onClose={handleCloseModal}>
                 <OrderInfo />
               </Modal>
             }
@@ -65,10 +64,7 @@ const AppContent = () => {
           <Route
             path='/ingredients/:id'
             element={
-              <Modal
-                title='Детали ингредиента'
-                onClose={() => window.history.back()}
-              >
+              <Modal title='Детали ингредиента' onClose={handleCloseModal}>
                 <IngredientDetails />
               </Modal>
             }
@@ -76,10 +72,7 @@ const AppContent = () => {
           <Route
             path='/profile/orders/:number'
             element={
-              <Modal
-                title='Детали заказа'
-                onClose={() => window.history.back()}
-              >
+              <Modal title='Детали заказа' onClose={handleCloseModal}>
                 <OrderInfo />
               </Modal>
             }
@@ -90,12 +83,10 @@ const AppContent = () => {
   );
 };
 const App = () => (
-  <BrowserRouter>
-    <div className={styles.app}>
-      <AppHeader />
-      <AppContent />
-    </div>
-  </BrowserRouter>
+  <div className={styles.app}>
+    <AppHeader />
+    <AppContent />
+  </div>
 );
 
 export default App;

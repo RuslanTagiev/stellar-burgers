@@ -1,9 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
 import ingredientsReducer from '../slices/ingredientsSlice';
+import feedsReducer from '../slices/feedSlices';
+import orderReducer from '../slices/orderSlice';
 
 const store = configureStore({
   reducer: {
-    ingredients: ingredientsReducer
+    ingredients: ingredientsReducer,
+    feeds: feedsReducer,
+    order: orderReducer
   }
 });
 

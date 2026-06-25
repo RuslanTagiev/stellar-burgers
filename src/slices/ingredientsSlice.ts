@@ -44,4 +44,12 @@ const ingredientsSlice = createSlice({
   }
 });
 
+export const getIngredientsState = (state: { ingredients: IngredientsState }) =>
+  state.ingredients;
+export const getIngredientsItems = (state: { ingredients: IngredientsState }) =>
+  state.ingredients.items;
+export const getIngredientsLoading = (state: {
+  ingredients: IngredientsState;
+}) => state.ingredients.loading;
+
 export default ingredientsSlice.reducer;

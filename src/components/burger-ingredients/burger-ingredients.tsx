@@ -5,16 +5,16 @@ import { useSelector } from 'react-redux';
 import { TTabMode } from '@utils-types';
 import { BurgerIngredientsUI } from '../ui/burger-ingredients';
 import {
-  selectIngredients,
-  selectIngredientsLoading
-} from '../../slices/ingredientsSelectors';
+  getIngredientsItems,
+  getIngredientsLoading
+} from '../../slices/ingredientsSlice';
 import { Preloader } from '@ui';
 
 export const BurgerIngredients: FC = () => {
   /** TODO: взять переменные из стора */
 
-  const allIngredients = useSelector(selectIngredients);
-  const loading = useSelector(selectIngredientsLoading);
+  const allIngredients = useSelector(getIngredientsItems);
+  const loading = useSelector(getIngredientsLoading);
 
   const buns = allIngredients.filter((ing) => ing.type === 'bun');
   const mains = allIngredients.filter((ing) => ing.type === 'main');
