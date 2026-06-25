@@ -2,6 +2,7 @@ import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { Preloader } from '@ui';
+import { getIsAuthChecked, getUserData } from '../../slices/userSlice';
 
 type ProtectedRouteProps = {
   onlyUnAuth?: boolean;
@@ -14,8 +15,8 @@ export const ProtectedRoute = ({
 }: ProtectedRouteProps) => {
   const location = useLocation();
 
-  const isAuthChecked = true;
-  const user = null;
+  const isAuthChecked = useSelector(getIsAuthChecked);
+  const user = useSelector(getUserData);
 
   // 1. Если проверка авторизации еще идет, показываем спиннер
   if (!isAuthChecked) {
