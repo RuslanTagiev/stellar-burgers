@@ -1,18 +1,19 @@
 import { useState, useRef, useEffect, FC } from 'react';
 import { useInView } from 'react-intersection-observer';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
-import { TTabMode } from '@utils-types';
+import { TTabMode, TIngredient } from '@utils-types';
 import { BurgerIngredientsUI } from '../ui/burger-ingredients';
 import {
   getIngredientsItems,
   getIngredientsLoading
 } from '../../slices/ingredientsSlice';
 import { Preloader } from '@ui';
+import { addIngredient } from '../../slices/constructorSlice';
 
 export const BurgerIngredients: FC = () => {
   /** TODO: взять переменные из стора */
-
+  const dispatch = useDispatch();
   const allIngredients = useSelector(getIngredientsItems);
   const loading = useSelector(getIngredientsLoading);
 
@@ -56,6 +57,11 @@ export const BurgerIngredients: FC = () => {
     if (tab === 'sauce')
       titleSaucesRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
+
+  const handleAddIngredient = (ingredient: TIngredient) => {
+    dispatch(addIngredient(ingredient));
+  };
+
   if (loading) {
     return <Preloader />;
   }
