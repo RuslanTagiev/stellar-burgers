@@ -5,9 +5,7 @@ import { getUserData, updateUser } from '../../slices/userSlice';
 import { AppDispatch } from '../../store';
 
 export const Profile: FC = () => {
-  /** TODO: взять переменную из стора */
   const dispatch = useDispatch<AppDispatch>();
-
   const user = useSelector(getUserData);
 
   const [formValue, setFormValue] = useState({
@@ -34,7 +32,10 @@ export const Profile: FC = () => {
     dispatch(updateUser(formValue))
       .unwrap()
       .then(() => {
-        console.log('Профиль успешно обновлен!');
+        setFormValue((prevState) => ({
+          ...prevState,
+          password: ''
+        }));
       })
       .catch((err: any) => {
         console.error('Ошибка при обновлении профиля:', err);

@@ -25,10 +25,13 @@ export const BurgerConstructor: FC = () => {
   const orderModalData = useSelector(getOrderData);
   const orderRequest = useSelector(getOrderLoading);
 
-  const constructorItems = {
-    bun: constructorState.bun,
-    ingredients: constructorState.ingredients || []
-  };
+  const constructorItems = useMemo(
+    () => ({
+      bun: constructorState.bun,
+      ingredients: constructorState.ingredients || []
+    }),
+    [constructorState.bun, constructorState.ingredients]
+  );
 
   const onOrderClick = () => {
     if (!constructorItems.bun || orderRequest) return;

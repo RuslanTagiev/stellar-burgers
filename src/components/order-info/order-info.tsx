@@ -1,11 +1,21 @@
-import { FC, useMemo } from 'react';
+import { FC, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { AppDispatch } from '../../store';
 import { Preloader } from '../ui/preloader';
 import { OrderInfoUI } from '../ui/order-info';
 import { TIngredient, TOrder } from '@utils-types';
 import { getIngredientsItems } from '../../slices/ingredientsSlice';
-import { getFeedsOrders } from '../../slices/feedSlices';
+import {
+  getFeedsOrders,
+  fetchOrderByNumber,
+  getOrderByNumberData
+} from '../../slices/feedSlices';
+import {
+  getProfileOrders,
+  fetchProfileOrders,
+  resetOrder
+} from '../../slices/orderSlice';
 
 type TIngredientsWithCount = {
   [key: string]: TIngredient & { count: number };
@@ -13,12 +23,44 @@ type TIngredientsWithCount = {
 
 export const OrderInfo: FC = () => {
   const { number } = useParams<{ number: string }>();
-  const ingredients = useSelector(getIngredientsItems);
-  const orders = useSelector(getFeedsOrders);
+  const dispatch = useDispatch<AppDispatch>();
 
-  const orderData: TOrder | undefined = orders.find(
-    (order) => order.number === Number(number)
-  );
+  const ingredients = useSelector(getIngredientsItems);
+  const feedOrders = useSelector(getFeedsOrders);
+  const profileOrders = useSelector(getProfileOrders);
+  const serverOrder = useSelector(getOrderByNumberData);
+
+  const orderData = useMemo(() => {
+    if (!number) return undefined;
+
+    const orderNumber = Number(number);
+
+    let order = feedOrders.find((item) => item.number === orderNumber);
+    if (order) return order;
+
+    order = profileOrders.find((item) => item.number === orderNumber);
+    if (order) return order;
+
+    if (serverOrder && serverOrder.number === orderNumber) {
+      return serverOrder;
+    }
+
+    return undefined;
+  }, [number, feedOrders, profileOrders, serverOrder]);
+
+  useEffect(() => {
+    if (!orderData && number) {
+      dispatch(fetchOrderByNumber(Number(number)));
+    }
+
+    if (profileOrders.length === 0) {
+      dispatch(fetchProfileOrders());
+    }
+
+    return () => {
+      dispatch(resetOrder());
+    };
+  }, [dispatch, orderData, number, profileOrders.length]);
 
   const orderInfo = useMemo(() => {
     if (!orderData || !ingredients.length) return null;
