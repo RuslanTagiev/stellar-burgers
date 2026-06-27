@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { getFeedsApi } from '@api';
 import { TOrder } from '@utils-types';
+import { RootState } from '../store';
 
 type FeedsState = {
   orders: TOrder[];
@@ -35,9 +36,9 @@ const feedsSlice = createSlice({
       })
       .addCase(fetchFeeds.fulfilled, (state, action) => {
         state.loading = false;
-        state.orders = action.payload.orders;
-        state.total = action.payload.total;
-        state.totalToday = action.payload.totalToday;
+        state.orders = action.payload.orders || [];
+        state.total = action.payload.total || 0;
+        state.totalToday = action.payload.totalToday || 0;
       })
       .addCase(fetchFeeds.rejected, (state, action) => {
         state.loading = false;
@@ -46,21 +47,11 @@ const feedsSlice = createSlice({
   }
 });
 
-export const getFeedsState = (state: { feeds: FeedsState }) => state.feeds;
-
-export const getFeedsOrders = (state: { feeds: FeedsState }) =>
-  state.feeds.orders;
-
-export const getFeedsTotal = (state: { feeds: FeedsState }) =>
-  state.feeds.total;
-
-export const getFeedsTotalToday = (state: { feeds: FeedsState }) =>
-  state.feeds.totalToday;
-
-export const getFeedsLoading = (state: { feeds: FeedsState }) =>
-  state.feeds.loading;
-
-export const getFeedsError = (state: { feeds: FeedsState }) =>
-  state.feeds.error;
+export const getFeedsState = (state: RootState) => state.feeds;
+export const getFeedsOrders = (state: RootState) => state.feeds.orders;
+export const getFeedsTotal = (state: RootState) => state.feeds.total;
+export const getFeedsTotalToday = (state: RootState) => state.feeds.totalToday;
+export const getFeedsLoading = (state: RootState) => state.feeds.loading;
+export const getFeedsError = (state: RootState) => state.feeds.error;
 
 export default feedsSlice.reducer;

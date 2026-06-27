@@ -20,10 +20,15 @@ export const BurgerConstructor: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-  const constructorItems = useSelector(getConstructorState);
+  const constructorState = useSelector(getConstructorState);
   const user = useSelector(getUserData);
   const orderModalData = useSelector(getOrderData);
   const orderRequest = useSelector(getOrderLoading);
+
+  const constructorItems = {
+    bun: constructorState.bun,
+    ingredients: constructorState.ingredients || []
+  };
 
   const onOrderClick = () => {
     if (!constructorItems.bun || orderRequest) return;

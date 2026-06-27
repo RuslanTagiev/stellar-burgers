@@ -1,44 +1,55 @@
 import {
+  Routes,
+  Route,
+  useLocation,
+  useNavigate,
+  Location
+} from 'react-router-dom';
+import { useEffect, FC } from 'react';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../../store';
+import { fetchIngredients } from '../../slices/ingredientsSlice';
+import { getUser } from '../../slices/userSlice';
+
+import {
   ConstructorPage,
   Feed,
-  ForgotPassword,
   Login,
-  NotFound404,
+  Register,
+  ForgotPassword,
+  ResetPassword,
   Profile,
   ProfileOrders,
-  Register,
-  ResetPassword
+  NotFound404
 } from '@pages';
-import { Modal, OrderInfo, IngredientDetails, AppHeader } from '@components';
-import '../../index.css';
-import styles from './app.module.css';
-import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import { fetchIngredients } from '../../slices/ingredientsSlice';
-import { AppDispatch } from '../../store';
-import { getUser } from '../../slices/userSlice';
+
+import { AppHeader, IngredientDetails, Modal, OrderInfo } from '@components';
 import { ProtectedRoute } from '../protected-route/protected-route';
 
-const AppContent = () => {
-  const location = useLocation();
+export const App: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const location = useLocation();
   const navigate = useNavigate();
-  const handleCloseModal = () => navigate(-1);
+
+  const state = location.state as { background?: Location } | null;
+  const background = state?.background;
 
   useEffect(() => {
     dispatch(fetchIngredients());
     dispatch(getUser());
   }, [dispatch]);
 
-  const state = location.state as { backgroundLocation?: Location } | null;
-  const background = state?.backgroundLocation;
+  const handleModalClose = () => {
+    navigate(-1);
+  };
+
   return (
     <>
-      {/* 1. ОСНОВНЫЕ МАРШРУТЫ: Если есть фоновая страница, фиксируем её. Если нет — берем текущую */}
+      <AppHeader />
       <Routes location={background || location}>
         <Route path='/' element={<ConstructorPage />} />
         <Route path='/feed' element={<Feed />} />
+
         <Route
           path='/login'
           element={
@@ -71,6 +82,7 @@ const AppContent = () => {
             </ProtectedRoute>
           }
         />
+
         <Route
           path='/profile'
           element={
@@ -87,9 +99,9 @@ const AppContent = () => {
             </ProtectedRoute>
           }
         />
-        {/* Страницы для открытия ингредиентов и заказов в отдельной вкладке */}
-        <Route path='/feed/:number' element={<OrderInfo />} />
+
         <Route path='/ingredients/:id' element={<IngredientDetails />} />
+        <Route path='/feed/:number' element={<OrderInfo />} />
         <Route
           path='/profile/orders/:number'
           element={
@@ -98,25 +110,25 @@ const AppContent = () => {
             </ProtectedRoute>
           }
         />
+
         <Route path='*' element={<NotFound404 />} />
       </Routes>
 
-      {/* 2. МОДАЛЬНЫЕ ОКНА: Рендерятся только тогда, когда мы кликнули по карточке И у нас есть сохраненный фон */}
       {background && (
         <Routes>
           <Route
-            path='/feed/:number'
+            path='/ingredients/:id'
             element={
-              <Modal title='Детали заказа' onClose={handleCloseModal}>
-                <OrderInfo />
+              <Modal title='Детали ингредиента' onClose={handleModalClose}>
+                <IngredientDetails />
               </Modal>
             }
           />
           <Route
-            path='/ingredients/:id'
+            path='/feed/:number'
             element={
-              <Modal title='Детали ингредиента' onClose={handleCloseModal}>
-                <IngredientDetails />
+              <Modal title='Информация о заказе' onClose={handleModalClose}>
+                <OrderInfo />
               </Modal>
             }
           />
@@ -124,7 +136,7 @@ const AppContent = () => {
             path='/profile/orders/:number'
             element={
               <ProtectedRoute>
-                <Modal title='Детали заказа' onClose={handleCloseModal}>
+                <Modal title='Информация о заказе' onClose={handleModalClose}>
                   <OrderInfo />
                 </Modal>
               </ProtectedRoute>
@@ -135,11 +147,5 @@ const AppContent = () => {
     </>
   );
 };
-const App = () => (
-  <div className={styles.app}>
-    <AppHeader />
-    <AppContent />
-  </div>
-);
 
 export default App;
