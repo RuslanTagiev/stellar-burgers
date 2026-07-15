@@ -47,22 +47,28 @@ test.describe('Тестирование функциональности кон�
   });
 
   test('Добавление ingredients в конструктор бургера', async ({ page }) => {
-    await page
-      .locator('div, a, li')
+    const bunCard = page
+      .getByRole('listitem')
       .filter({ hasText: 'Краторная булка N-200i' })
-      .locator('button')
-      .first()
-      .click();
-    await page
-      .locator('div, a, li')
-      .filter({ hasText: 'Биокотлета из марсианской' })
-      .locator('button')
-      .first()
-      .click();
+      .first();
+    await bunCard.getByRole('button', { name: /добавить/i }).click();
 
-    const constructorSection = page.locator('body');
+    await page.waitForTimeout(200);
+
+    const mainCard = page
+      .getByRole('listitem')
+      .filter({ hasText: 'Биокотлета из марсианской XL-говядины' })
+      .first();
+    await mainCard.getByRole('button', { name: /добавить/i }).click();
+
+    const constructorSection = page
+      .locator('section')
+      .filter({ hasText: /Оформить заказ/i })
+      .first();
     await expect(constructorSection).toContainText('Краторная булка N-200i');
-    await expect(constructorSection).toContainText('Биокотлета из марсианской');
+    await expect(constructorSection).toContainText(
+      'Биокотлета из марсианской XL-говядины'
+    );
   });
 
   test('Работа модальных окон описания ingredients', async ({ page }) => {
@@ -70,9 +76,12 @@ test.describe('Тестирование функциональности кон�
 
     const modal = page.locator('#modals');
     await expect(modal).toContainText('Детали ингредиента');
+    await expect(modal).toContainText('Краторная булка N-200i');
 
     await modal.locator('button').first().click();
     await expect(modal).toBeEmpty();
+
+    await page.waitForTimeout(200);
 
     await page.getByText('Краторная булка N-200i').click();
     await expect(modal).toContainText('Детали ингредиента');
@@ -82,27 +91,34 @@ test.describe('Тестирование функциональности кон�
   });
 
   test('Полный цикл создания заказа с авторизацией', async ({ page }) => {
-    await page
-      .locator('div, a, li')
+    const bunCard = page
+      .getByRole('listitem')
       .filter({ hasText: 'Краторная булка N-200i' })
-      .locator('button')
-      .first()
-      .click();
-    await page
-      .locator('div, a, li')
-      .filter({ hasText: 'Биокотлета из марсианской' })
-      .locator('button')
-      .first()
-      .click();
+      .first();
+    await bunCard.getByRole('button', { name: /добавить/i }).click();
+
+    await page.waitForTimeout(200);
+
+    const mainCard = page
+      .getByRole('listitem')
+      .filter({ hasText: 'Биокотлета из марсианской XL-говядины' })
+      .first();
+    await mainCard.getByRole('button', { name: /добавить/i }).click();
 
     await page.getByRole('button', { name: /оформить заказ/i }).click();
 
     const modal = page.locator('#modals');
-    await expect(modal).toContainText('48573');
+    const orderNumberString = String(MOCK_ORDER.order.number);
+    await expect(modal).toContainText(orderNumberString);
 
     await modal.locator('button').first().click();
     await expect(modal).toBeEmpty();
 
-    await expect(page.locator('body')).toContainText('Выберите булки');
+    const constructorSection = page
+      .locator('section')
+      .filter({ hasText: /Оформить заказ/i })
+      .first();
+    await expect(constructorSection).toContainText('Выберите булки');
+    await expect(constructorSection).toContainText('Выберите начинку');
   });
 });
